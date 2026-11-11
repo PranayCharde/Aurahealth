@@ -8,6 +8,7 @@ import UserListTable from './components/users/UserListTable';
 import UserDetailModal from './components/users/UserDetailModal';
 import NutritionTelemetryInspector from './components/dashboard/NutritionTelemetryInspector';
 import DatabaseInspector from './components/dashboard/DatabaseInspector';
+import PrivacyPolicyView from './components/compliance/PrivacyPolicyView';
 import { MOCK_USERS, SYSTEM_METRICS } from './mock/mockUserData';
 import { checkBackendStatus, fetchAllUsers, fetchSystemMetrics, deleteUser } from './services/api';
 
@@ -198,6 +199,15 @@ export default function App() {
             <div className="animate-fade-in">
               <DatabaseInspector
                 systemMetrics={systemMetrics}
+                isDark={isDark}
+              />
+            </div>
+          )}
+
+          {/* VIEW: GOOGLE PLAY PRIVACY POLICY & COMPLIANCE */}
+          {currentView === 'privacy' && (
+            <div className="animate-fade-in">
+              <PrivacyPolicyView
                 isDark={isDark}
               />
             </div>

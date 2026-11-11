@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, RefreshCw, Server, Database, Bell } from 'lucide-react';
+import { Download, RefreshCw, Server, Database, Bell, ShieldCheck } from 'lucide-react';
 import SearchInput from '../common/SearchInput';
 
 export default function Header({
@@ -19,6 +19,7 @@ export default function Header({
     vitals: { title: 'Vitals & ECG Registry', subtitle: 'Clinical heart rate, HRV, blood pressure & ECG recordings' },
     activity: { title: 'Activity, Strain & Workouts', subtitle: 'Exercise records, daily strain scores and caloric burn' },
     database: { title: 'MongoDB & Backend Architecture', subtitle: 'REST API health, MongoDB connection status and cloud sync' },
+    privacy: { title: 'Google Play Privacy Policy & Compliance', subtitle: 'Public disclosure documentation, telemetry registry & Data Safety compliance' },
   };
 
   const current = titles[activeView] || titles.dashboard;
@@ -92,6 +93,31 @@ export default function Header({
           />
           {isDbLive ? 'MONGODB CONNECTED' : 'BACKEND: PORT 5000'}
         </div>
+
+        {/* Privacy Policy Quick Link */}
+        <a
+          href="/privacy-policy.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open Public Privacy Policy (Google Play Store)"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '7px 12px',
+            borderRadius: '10px',
+            backgroundColor: isDark ? 'rgba(59, 130, 246, 0.12)' : 'rgba(59, 130, 246, 0.1)',
+            border: '1px solid rgba(59, 130, 246, 0.25)',
+            fontSize: '11px',
+            fontWeight: '700',
+            color: '#3B82F6',
+            textDecoration: 'none',
+            fontFamily: 'var(--font-heading)',
+          }}
+        >
+          <ShieldCheck size={13} />
+          <span>PRIVACY POLICY</span>
+        </a>
 
         {/* Refresh Action */}
         <button

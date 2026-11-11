@@ -10,6 +10,7 @@ import {
   Activity,
   Sun,
   Moon,
+  ExternalLink,
 } from 'lucide-react';
 
 export default function Sidebar({
@@ -132,6 +133,79 @@ export default function Sidebar({
               </button>
             );
           })}
+
+          {/* Compliance & Store Section */}
+          <div style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', color: isDark ? '#475569' : '#94A3B8', padding: '14px 12px 6px 12px' }}>
+            STORE & COMPLIANCE
+          </div>
+
+          <button
+            onClick={() => onSelectView('privacy')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '11px 14px',
+              borderRadius: '12px',
+              backgroundColor: currentView === 'privacy'
+                ? isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(5, 150, 105, 0.12)'
+                : 'transparent',
+              color: currentView === 'privacy' ? '#10B981' : isDark ? '#94A3B8' : '#475569',
+              border: currentView === 'privacy'
+                ? '1px solid rgba(16, 185, 129, 0.3)'
+                : '1px solid transparent',
+              textAlign: 'left',
+              fontSize: '13px',
+              fontWeight: currentView === 'privacy' ? '700' : '500',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <ShieldCheck
+                size={18}
+                color={currentView === 'privacy' ? '#10B981' : isDark ? '#64748B' : '#94A3B8'}
+                style={{ marginRight: '10px' }}
+              />
+              <span>Privacy Policy</span>
+            </div>
+            <span
+              style={{
+                fontSize: '10px',
+                fontWeight: '700',
+                padding: '2px 7px',
+                borderRadius: '8px',
+                backgroundColor: currentView === 'privacy' ? '#10B981' : isDark ? 'rgba(16, 185, 129, 0.15)' : '#DCFCE7',
+                color: currentView === 'privacy' ? '#FFFFFF' : '#10B981',
+              }}
+            >
+              Play Store
+            </span>
+          </button>
+
+          <a
+            href="/privacy-policy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '9px 14px',
+              borderRadius: '12px',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(15, 23, 42, 0.02)',
+              color: isDark ? '#64748B' : '#94A3B8',
+              textDecoration: 'none',
+              fontSize: '12px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              border: '1px dashed rgba(255, 255, 255, 0.08)',
+              marginTop: '2px',
+            }}
+          >
+            <span>Open Standalone Web URL</span>
+            <ExternalLink size={13} />
+          </a>
         </div>
       </div>
 
