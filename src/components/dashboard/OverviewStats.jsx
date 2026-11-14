@@ -16,7 +16,7 @@ export default function OverviewStats({ users = [], systemMetrics, isDark = true
   );
 
   const avgStrain = (
-    users.reduce((acc, u) => acc + (u.activity?.strain || 14), 0) / (totalUsers || 1)
+    users.reduce((acc, u) => acc + (u.activity?.strain || u.activity?.strainScore || 14), 0) / (totalUsers || 1)
   ).toFixed(1);
 
   return (

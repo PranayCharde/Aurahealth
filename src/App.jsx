@@ -78,7 +78,7 @@ export default function App() {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to remove this athlete from the admin panel and database?')) {
       await deleteUser(userId);
-      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      setUsers((prev) => prev.filter((u) => (u.id || u._id) !== userId));
     }
   };
 

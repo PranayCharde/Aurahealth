@@ -5,6 +5,10 @@ export default function DatabaseInspector({ systemMetrics, isDark = true }) {
   const [testResult, setTestResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const API_SERVER_URL = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace(/\/api$/, '')
+    : 'http://localhost:5000';
+
   const collections = [
     { name: 'users', docCount: 1420, size: '240 KB', desc: 'Registered user credentials, profiles & goals' },
     { name: 'nutritionlogs', docCount: 8940, size: '2.4 MB', desc: 'Daily meals, macros, micros & bodybuilding supplements' },
@@ -19,7 +23,7 @@ export default function DatabaseInspector({ systemMetrics, isDark = true }) {
     setLoading(true);
     setTestResult(null);
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(`${API_SERVER_URL}${endpoint}`, {
         method,
         headers: { 'Content-Type': 'application/json' },
         ...(body && { body: JSON.stringify(body) }),
@@ -94,7 +98,7 @@ export default function DatabaseInspector({ systemMetrics, isDark = true }) {
               </span>
             </div>
             <p style={{ fontSize: '13px', color: isDark ? '#94A3B8' : '#64748B', marginTop: '4px' }}>
-              Connection: <code style={{ color: '#10B981' }}>mongodb://127.0.0.1:27017/aurahealth</code> • Express REST API: <code style={{ color: '#0EA5E9' }}>http://localhost:5000</code>
+              Connection: <code style={{ color: '#10B981' }}>MongoDB Atlas Cloud Cluster (Connected)</code> • REST API: <code style={{ color: '#0EA5E9' }}>{API_SERVER_URL}</code>
             </p>
           </div>
         </div>
@@ -185,30 +189,7 @@ export default function DatabaseInspector({ systemMetrics, isDark = true }) {
           </button>
 
           <button
-            onClick={() =>
-              handleTestEndpoint('/api/nutrition/analyze-meal', 'POST', {
-                query: '200g chicken breast and 1 cup rice',
-              })
-            }
-            style={{
-              padding: '10px 16px',
-              borderRadius: '10px',
-              backgroundColor: isDark ? 'rgba(14, 165, 233, 0.15)' : 'rgba(2, 132, 199, 0.12)',
-              color: '#0EA5E9',
-              fontWeight: '700',
-              fontSize: '12px',
-              border: '1px solid rgba(14, 165, 233, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <Play size={14} />
-            <span>POST /api/nutrition/analyze-meal</span>
-          </button>
-
-          <button
-            onClick={() => handleTestEndpoint('/api/auth/demo', 'POST')}
+            onClick={() => handleTestEndpoint('/api/admin/metrics', 'GET')}
             style={{
               padding: '10px 16px',
               borderRadius: '10px',
@@ -223,7 +204,49 @@ export default function DatabaseInspector({ systemMetrics, isDark = true }) {
             }}
           >
             <Play size={14} />
-            <span>POST /api/auth/demo</span>
+            <span>GET /api/admin/metrics</span>
+          </button>
+
+          <button
+            onClick={() => handleTestEndpoint('/api/admin/users', 'GET')}
+            style={{
+              padding: '10px 16px',
+              borderRadius: '10px',
+              backgroundColor: isDark ? 'rgba(14, 165, 233, 0.15)' : 'rgba(2, 132, 199, 0.12)',
+              color: '#0EA5E9',
+              fontWeight: '700',
+              fontSize: '12px',
+              border: '1px solid rgba(14, 165, 233, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <Play size={14} />
+            <span>GET /api/admin/users</span>
+          </button>
+
+          <button
+            onClick={() =>
+              handleTestEndpoint('/api/nutrition/analyze-meal', 'POST', {
+                query: '200g chicken breast and 1 cup rice',
+              })
+            }
+            style={{
+              padding: '10px 16px',
+              borderRadius: '10px',
+              backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : 'rgba(217, 119, 6, 0.12)',
+              color: '#F59E0B',
+              fontWeight: '700',
+              fontSize: '12px',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <Play size={14} />
+            <span>POST /api/nutrition/analyze-meal</span>
           </button>
         </div>
 

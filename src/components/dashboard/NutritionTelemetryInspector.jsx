@@ -26,10 +26,13 @@ export default function NutritionTelemetryInspector({ users = [], isDark = true 
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {users.map((u) => {
-            const isSelected = selectedUser?.id === u.id;
+            const userId = u.id || u._id;
+            const isSelected = selectedUser && (selectedUser.id === userId || selectedUser._id === userId);
+            const initial = (u.name || 'U').charAt(0).toUpperCase();
+
             return (
               <button
-                key={u.id}
+                key={userId}
                 onClick={() => setSelectedUser(u)}
                 style={{
                   display: 'flex',
@@ -47,10 +50,39 @@ export default function NutritionTelemetryInspector({ users = [], isDark = true 
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <img src={u.avatar} alt={u.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
+                  {u.avatar ? (
+                    <img
+                      src={u.avatar}
+                      alt={u.name}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.nextSibling) {
+                          e.currentTarget.nextSibling.style.display = 'flex';
+                        }
+                      }}
+                      style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }}
+                    />
+                  ) : null}
+                  <div
+                    style={{
+                      display: u.avatar ? 'none' : 'flex',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                      color: '#10B981',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: '700',
+                      fontSize: '14px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {initial}
+                  </div>
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: '700', color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                      {u.name}
+                      {u.name || 'Athlete'}
                     </div>
                     <div style={{ fontSize: '11px', color: '#10B981', fontWeight: '600' }}>
                       {u.nutrition?.phase || 'LEAN HYPERTROPHY'}
@@ -60,10 +92,10 @@ export default function NutritionTelemetryInspector({ users = [], isDark = true 
 
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '12px', fontWeight: '700', color: '#F59E0B' }}>
-                    {u.nutrition?.actual?.protein}g P
+                    {u.nutrition?.actual?.protein ?? 0}g P
                   </div>
                   <div style={{ fontSize: '10px', color: isDark ? '#64748B' : '#94A3B8' }}>
-                    {u.nutrition?.actual?.calories} kcal
+                    {u.nutrition?.actual?.calories ?? 0} kcal
                   </div>
                 </div>
               </button>
@@ -98,12 +130,12 @@ export default function NutritionTelemetryInspector({ users = [], isDark = true 
           {/* Caloric & Macronutrient Gauges */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '24px' }}>
             {[
-              { label: 'PROTEIN', actual: selectedUser.nutrition?.actual?.protein, target: selectedUser.nutrition?.targets?.protein, unit: 'g', col: '#10B981', bg: 'rgba(16, 185, 129, 0.1)' },
-              { label: 'CARBOHYDRATES', actual: selectedUser.nutrition?.actual?.carbs, target: selectedUser.nutrition?.targets?.carbs, unit: 'g', col: '#0EA5E9', bg: 'rgba(14, 165, 233, 0.1)' },
-              { label: 'FATS', actual: selectedUser.nutrition?.actual?.fats, target: selectedUser.nutrition?.targets?.fats, unit: 'g', col: '#F43F5E', bg: 'rgba(244, 63, 94, 0.1)' },
-              { label: 'CALORIES', actual: selectedUser.nutrition?.actual?.calories, target: selectedUser.nutrition?.targets?.calories, unit: 'kcal', col: '#F59E0B', bg: 'rgba(245, 158, 11, 0.1)' },
+              { label: 'PROTEIN', actual: selectedUser.nutrition?.actual?.protein ?? 0, target: selectedUser.nutrition?.targets?.protein ?? 195, unit: 'g', col: '#10B981', bg: 'rgba(16, 185, 129, 0.1)' },
+              { label: 'CARBOHYDRATES', actual: selectedUser.nutrition?.actual?.carbs ?? 0, target: selectedUser.nutrition?.targets?.carbs ?? 250, unit: 'g', col: '#0EA5E9', bg: 'rgba(14, 165, 233, 0.1)' },
+              { label: 'FATS', actual: selectedUser.nutrition?.actual?.fats ?? 0, target: selectedUser.nutrition?.targets?.fats ?? 65, unit: 'g', col: '#F43F5E', bg: 'rgba(244, 63, 94, 0.1)' },
+              { label: 'CALORIES', actual: selectedUser.nutrition?.actual?.calories ?? 0, target: selectedUser.nutrition?.targets?.calories ?? 2500, unit: 'kcal', col: '#F59E0B', bg: 'rgba(245, 158, 11, 0.1)' },
             ].map((m, idx) => {
-              const pct = Math.min(100, Math.round((m.actual / (m.target || 1)) * 100));
+              const pct = Math.min(100, Math.round(((m.actual || 0) / (m.target || 1)) * 100));
               return (
                 <div
                   key={idx}
@@ -145,14 +177,14 @@ export default function NutritionTelemetryInspector({ users = [], isDark = true 
             <div>
               <span style={{ fontSize: '11px', fontWeight: '700', color: '#8B5CF6' }}>DIETARY FIBER (SATIETY & DIGESTION)</span>
               <div style={{ fontSize: '18px', fontWeight: '700', color: isDark ? '#F8FAFC' : '#0F172A', marginTop: '2px' }}>
-                {selectedUser.nutrition?.actual?.fiber}g <span style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B' }}>/ {selectedUser.nutrition?.targets?.fiber}g target</span>
+                {selectedUser.nutrition?.actual?.fiber ?? 0}g <span style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B' }}>/ {selectedUser.nutrition?.targets?.fiber ?? 35}g target</span>
               </div>
             </div>
 
             <div>
               <span style={{ fontSize: '11px', fontWeight: '700', color: '#0EA5E9' }}>INTRA-CELLULAR SODIUM (VASCULARITY & PUMP)</span>
               <div style={{ fontSize: '18px', fontWeight: '700', color: isDark ? '#F8FAFC' : '#0F172A', marginTop: '2px' }}>
-                {selectedUser.nutrition?.actual?.sodium}mg <span style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B' }}>/ {selectedUser.nutrition?.targets?.sodium}mg target</span>
+                {selectedUser.nutrition?.actual?.sodium ?? 0}mg <span style={{ fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B' }}>/ {selectedUser.nutrition?.targets?.sodium ?? 2300}mg target</span>
               </div>
             </div>
           </div>
@@ -163,31 +195,35 @@ export default function NutritionTelemetryInspector({ users = [], isDark = true 
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {selectedUser.nutrition?.meals?.map((meal, index) => (
-              <div
-                key={index}
-                style={{
-                  padding: '14px',
-                  borderRadius: '12px',
-                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#F1F5F9',
-                  border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)'}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: '700', color: '#10B981', fontSize: '14px' }}>{meal.category}</span>
-                    <span style={{ fontSize: '11px', color: isDark ? '#64748B' : '#94A3B8' }}>{meal.time}</span>
+            {selectedUser.nutrition?.meals && selectedUser.nutrition.meals.length > 0 ? (
+              selectedUser.nutrition.meals.map((meal, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: '14px',
+                    borderRadius: '12px',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.02)' : '#F1F5F9',
+                    border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontWeight: '700', color: '#10B981', fontSize: '14px' }}>{meal.category || 'Meal'}</span>
+                      <span style={{ fontSize: '11px', color: isDark ? '#64748B' : '#94A3B8' }}>{meal.time || 'Logged Today'}</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: isDark ? '#F8FAFC' : '#0F172A', marginTop: '4px' }}>
+                      {Array.isArray(meal.foods) ? meal.foods.join(' • ') : 'Balanced fuel'}
+                    </div>
                   </div>
-                  <div style={{ fontSize: '13px', color: isDark ? '#F8FAFC' : '#0F172A', marginTop: '4px' }}>
-                    {meal.foods.join(' • ')}
-                  </div>
+                  <Utensils size={18} color="#10B981" />
                 </div>
-                <Utensils size={18} color="#10B981" />
-              </div>
-            ))}
+              ))
+            ) : (
+              <p style={{ color: isDark ? '#64748B' : '#94A3B8', fontSize: '13px' }}>No meals recorded for this athlete.</p>
+            )}
           </div>
         </div>
       )}

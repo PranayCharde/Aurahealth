@@ -1,7 +1,7 @@
 // AuraHealth Admin Panel - API & Backend Integration Service
 import { MOCK_USERS, SYSTEM_METRICS } from '../mock/mockUserData';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /**
  * Check backend connection status
@@ -52,7 +52,7 @@ export async function fetchUserTelemetry(userId) {
   } catch (err) {
     console.warn('[Admin API] User telemetry fallback:', err.message);
   }
-  const user = MOCK_USERS.find((u) => u.id === userId);
+  const user = MOCK_USERS.find((u) => u.id === userId || u._id === userId);
   return user || MOCK_USERS[0];
 }
 

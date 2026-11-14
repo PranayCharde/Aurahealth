@@ -15,17 +15,22 @@ export default function UserListTable({
   const [sortAsc, setSortAsc] = useState(true);
 
   // Extract unique roles
-  const roles = ['All', ...new Set(users.map((u) => u.role))];
+  const roles = ['All', ...new Set(users.map((u) => u.role).filter(Boolean))];
 
   // Filtered & Sorted users
   const filteredUsers = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
     return users
       .filter((user) => {
+        const name = (user.name || '').toLowerCase();
+        const email = (user.email || '').toLowerCase();
+        const goal = (user.profile?.goal || '').toLowerCase();
+
         const matchesSearch =
-          !searchQuery.trim() ||
-          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.profile.goal.toLowerCase().includes(searchQuery.toLowerCase());
+          !q ||
+          name.includes(q) ||
+          email.includes(q) ||
+          goal.includes(q);
 
         const matchesRole = roleFilter === 'All' || user.role === roleFilter;
         const matchesStatus = statusFilter === 'All' || user.status === statusFilter;
@@ -177,14 +182,16 @@ export default function UserListTable({
               </tr>
             ) : (
               filteredUsers.map((user) => {
+                const userId = user.id || user._id;
                 const readiness = user.composite?.readinessScore || 85;
                 const readinessColor = readiness >= 90 ? '#10B981' : readiness >= 80 ? '#0EA5E9' : '#F59E0B';
                 const proteinActual = user.nutrition?.actual?.protein || 0;
                 const proteinTarget = user.nutrition?.targets?.protein || 195;
+                const initial = (user.name || 'U').charAt(0).toUpperCase();
 
                 return (
                   <tr
-                    key={user.id}
+                    key={userId}
                     style={{
                       borderBottom: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.04)'}`,
                       fontSize: '13px',
@@ -196,20 +203,46 @@ export default function UserListTable({
                     {/* User Profile */}
                     <td style={{ padding: '14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <img
-                          src={user.avatar}
-                          alt={user.name}
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            alt={user.name}
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              if (e.currentTarget.nextSibling) {
+                                e.currentTarget.nextSibling.style.display = 'flex';
+                              }
+                            }}
+                            style={{
+                              width: '38px',
+                              height: '38px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: `2px solid ${readinessColor}`,
+                            }}
+                          />
+                        ) : null}
+                        <div
                           style={{
+                            display: user.avatar ? 'none' : 'flex',
                             width: '38px',
                             height: '38px',
                             borderRadius: '50%',
-                            objectFit: 'cover',
+                            backgroundColor: 'rgba(16, 185, 129, 0.15)',
                             border: `2px solid ${readinessColor}`,
+                            color: '#10B981',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: '700',
+                            fontSize: '15px',
+                            flexShrink: 0,
                           }}
-                        />
+                        >
+                          {initial}
+                        </div>
                         <div>
                           <div style={{ fontWeight: '700', color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                            {user.name}
+                            {user.name || 'Anonymous User'}
                           </div>
                           <div style={{ fontSize: '11px', color: isDark ? '#64748B' : '#94A3B8' }}>
                             {user.email}
@@ -221,7 +254,7 @@ export default function UserListTable({
                     {/* Status */}
                     <td style={{ padding: '14px' }}>
                       <Badge
-                        label={user.status}
+                        label={user.status || 'Active'}
                         variant={user.status === 'Active' ? 'primary' : 'muted'}
                         size="sm"
                       />
@@ -230,7 +263,7 @@ export default function UserListTable({
                     {/* Role & Phase */}
                     <td style={{ padding: '14px' }}>
                       <div style={{ fontWeight: '600', color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                        {user.role}
+                        {user.role || 'Athlete'}
                       </div>
                       <div style={{ fontSize: '11px', color: '#10B981', fontWeight: '600' }}>
                         {user.nutrition?.phase || 'LEAN HYPERTROPHY'}
@@ -240,10 +273,10 @@ export default function UserListTable({
                     {/* Stats */}
                     <td style={{ padding: '14px' }}>
                       <div style={{ color: isDark ? '#F8FAFC' : '#0F172A' }}>
-                        {user.profile.weight} • {user.profile.height}
+                        {user.profile?.weight || '--'} • {user.profile?.height || '--'}
                       </div>
                       <div style={{ fontSize: '11px', color: isDark ? '#64748B' : '#94A3B8' }}>
-                        Age {user.profile.age} • BF: {user.profile.bodyFat || '18%'}
+                        Age {user.profile?.age || '--'} • BF: {user.profile?.bodyFat || '--'}
                       </div>
                     </td>
 
@@ -278,7 +311,7 @@ export default function UserListTable({
 
                     {/* Last Active */}
                     <td style={{ padding: '14px', fontSize: '12px', color: isDark ? '#94A3B8' : '#64748B' }}>
-                      {user.lastActive}
+                      {user.lastActive || 'Recently'}
                     </td>
 
                     {/* Actions */}
@@ -304,7 +337,7 @@ export default function UserListTable({
                         </button>
 
                         <button
-                          onClick={() => onDeleteUser(user.id)}
+                          onClick={() => onDeleteUser(userId)}
                           title="Remove Athlete"
                           style={{
                             padding: '6px',
